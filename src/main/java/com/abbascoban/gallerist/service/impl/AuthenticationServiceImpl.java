@@ -105,7 +105,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
 
         } catch (Exception e) {
-            throw new BaseException(new ErrorMessage(MessageType.USERNAME_OR_PASSWORD_INVALID, e.getMessage()));
+            throw new BaseException(new ErrorMessage(MessageType.USERNAME_OR_PASSWORD_INVALID,""));
         }
     }
 
