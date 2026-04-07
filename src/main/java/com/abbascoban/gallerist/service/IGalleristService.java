@@ -18,5 +18,7 @@ public interface IGalleristService {
 
     public String deletegallerist(DtoGalleristDeleteReq dtoGalleristDeleteReq);
 
+    public DtoGallerist getGallerist();
+
 
 }

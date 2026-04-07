@@ -23,7 +23,8 @@ public class DtoCustomer extends DtoBase {
 
     private DtoAddress address;
 
-
     private DtoAccount account;
+
+    private DtoUser user;
 
 }

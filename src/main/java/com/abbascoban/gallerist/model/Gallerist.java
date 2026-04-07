@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
+
 
 @Entity
 @Table(name = "gallerist")
@@ -24,6 +26,18 @@ public class Gallerist extends BaseEntity {
     @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "gallerist_name")
+    private String galleristName;
+
+    @Column(name = "tckn")
+    private String tckn;
+
+    @Column(name = "birth_of_date")
+    private Date birthOfDate;
+
     @OneToOne
     private Address address;
+
+    @OneToOne
+    private User user;
 }

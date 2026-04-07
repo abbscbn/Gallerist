@@ -16,4 +16,6 @@ public interface IRestGalleristController {
 
     public RootEntity<String> deletegallerist(DtoGalleristDeleteReq dtoGalleristDeleteReq);
 
+    public RootEntity<DtoGallerist> getGallerist();
+
 }

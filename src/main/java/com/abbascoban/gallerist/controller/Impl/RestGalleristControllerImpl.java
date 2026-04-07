@@ -40,6 +40,13 @@ public class RestGalleristControllerImpl extends RestBaseController implements I
         return ok(galleristService.updateGallerist(dtoGalleristUI));
     }
 
+    @GetMapping("/me")
+    @Override
+    public RootEntity<DtoGallerist> getGallerist() {
+
+        return ok(galleristService.getGallerist());
+    }
+
     @GetMapping("/gelallgallerist")
     @Override
     public RootEntity<List<DtoGallerist>> getAllGallerist() {

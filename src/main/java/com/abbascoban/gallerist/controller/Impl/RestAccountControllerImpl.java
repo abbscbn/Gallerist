@@ -8,6 +8,8 @@ import com.abbascoban.gallerist.dto.DtoAccountDeleteReq;
 import com.abbascoban.gallerist.dto.DtoAccounttUI;
 import com.abbascoban.gallerist.service.IAccountService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -26,6 +28,7 @@ public class RestAccountControllerImpl extends RestBaseController implements IRe
     @PostMapping("/save")
     @Override
     public RootEntity<DtoAccount> saveAccount(@Valid @RequestBody DtoAccounttUI dtoAccounttUI) {
+
         return ok(accountService.saveAccount(dtoAccounttUI));
     }
 

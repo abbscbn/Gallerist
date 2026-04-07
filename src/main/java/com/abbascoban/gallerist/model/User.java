@@ -31,6 +31,9 @@ public class User  extends BaseEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(name = "isprofilecompleted")
+    private Boolean isProfileCompleted;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(()->"ROLE_"+role.name());

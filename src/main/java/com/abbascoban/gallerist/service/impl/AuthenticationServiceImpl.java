@@ -6,8 +6,12 @@ import com.abbascoban.gallerist.exception.BaseException;
 import com.abbascoban.gallerist.exception.ErrorMessage;
 import com.abbascoban.gallerist.exception.MessageType;
 import com.abbascoban.gallerist.jwt.JwtService;
+import com.abbascoban.gallerist.model.Customer;
+import com.abbascoban.gallerist.model.Gallerist;
 import com.abbascoban.gallerist.model.RefreshToken;
 import com.abbascoban.gallerist.model.User;
+import com.abbascoban.gallerist.repository.CustomerRepository;
+import com.abbascoban.gallerist.repository.GalleristRepository;
 import com.abbascoban.gallerist.repository.RefreshTokenRepository;
 import com.abbascoban.gallerist.repository.UserRepository;
 import com.abbascoban.gallerist.service.IAuthenticationService;
@@ -37,6 +41,10 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
     private final RefreshTokenRepository refreshTokenRepository;
 
+    private final CustomerRepository customerRepository;
+
+    private final GalleristRepository galleristRepository;
+
     public User createUser(RegisterRequest input){
 
         User user= new User();
@@ -47,9 +55,11 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
         if(input.getRole().equals(Role.CUSTOMER.name())){
             user.setRole(Role.CUSTOMER);
+            user.setIsProfileCompleted(false);
         }
         if(input.getRole().equals(Role.GALLERIST.name())){
             user.setRole(Role.GALLERIST);
+            user.setIsProfileCompleted(false);
         }
 
 
@@ -64,6 +74,18 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         DtoUser dtoUser= new DtoUser();
         User savedUser = createUser(input);
 
+        if(savedUser.getRole().equals(Role.CUSTOMER)){
+            Customer customer= new Customer();
+            customer.setUser(savedUser);
+            customerRepository.save(customer);
+
+        }
+        if(savedUser.getRole().equals(Role.GALLERIST)){
+            Gallerist gallerist= new Gallerist();
+            gallerist.setUser(savedUser);
+            galleristRepository.save(gallerist);
+        }
+
         BeanUtils.copyProperties(savedUser,dtoUser);
 
         return dtoUser;
@@ -73,12 +95,12 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
         RefreshToken refreshToken= new RefreshToken();
 
-        refreshToken.setCreateTime(new Date());
+
         refreshToken.setExpiredDate(new Date(System.currentTimeMillis() +1000*60*60*4));
 
         refreshToken.setRefreshToken(UUID.randomUUID().toString());
         refreshToken.setUser(user);
-
+        refreshToken.setCreateTime(new Date());
         return refreshToken;
 
 
@@ -101,7 +123,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             RefreshToken savedRefreshToken = refreshTokenRepository.save(createRefreshToken(optUser.get()));
 
 
-            return new AuthResponse(accessToken, savedRefreshToken.getRefreshToken(),optUser.get().getRole().name());
+            return new AuthResponse(accessToken, savedRefreshToken.getRefreshToken(),optUser.get().getRole().name(),optUser.get().getId(),optUser.get().getIsProfileCompleted());
 
 
         } catch (Exception e) {
@@ -133,7 +155,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
         RefreshToken savedRefreshToken = refreshTokenRepository.save(createRefreshToken(user));
 
-        return new AuthResponse(accessToken, savedRefreshToken.getRefreshToken(),user.getRole().name());
+        return new AuthResponse(accessToken, savedRefreshToken.getRefreshToken(),user.getRole().name(),user.getId(),user.getIsProfileCompleted());
 
 
 

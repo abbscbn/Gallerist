@@ -24,6 +24,7 @@ public class SecurityConfig {
     public static final String REGISTER = "/register";
     public static final String AUTHENTICATE = "/authenticate";
     public static final String REFRESH_TOKEN = "/refreshToken";
+    public static final String GET_ALL_GALLERISTCAR="/rest/api/gallerist-car/getallgalleristcar";
 
 
     private final AuthenticationProvider authenticationProvider;
@@ -37,9 +38,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+            http
+                .cors()
+                .and()
+                .csrf().disable()
                 .authorizeHttpRequests(request->
-                        request.requestMatchers(REGISTER , AUTHENTICATE , REFRESH_TOKEN).permitAll()
+                        request.requestMatchers(REGISTER , AUTHENTICATE , REFRESH_TOKEN,GET_ALL_GALLERISTCAR).permitAll()
                                 .anyRequest()
                                 .authenticated())
                 .exceptionHandling().authenticationEntryPoint(authEntryPoint).accessDeniedHandler(customAccessDeniedHandler).and()

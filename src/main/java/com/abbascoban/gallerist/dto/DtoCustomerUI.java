@@ -29,4 +29,6 @@ public class DtoCustomerUI extends DtoBase {
     @NotNull
     private Long accountId;
 
+    private Long userId;
+
 }

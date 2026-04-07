@@ -37,5 +37,8 @@ public class Customer extends BaseEntity{
     @OneToOne
     private Account account;
 
+    @OneToOne
+    private User user;
+
 
 }
