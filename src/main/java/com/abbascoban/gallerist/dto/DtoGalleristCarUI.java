@@ -16,8 +16,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class DtoGalleristCarUI extends DtoBase {
 
-    @NotNull
-    private Long galleristId;
 
     @NotNull
     private Long caId;

@@ -5,6 +5,6 @@ import com.abbascoban.gallerist.dto.DtoSaledCarUI;
 
 public interface IRestSaledCarController {
 
-    public RootEntity<DtoSaledCar> buyCar(DtoSaledCarUI dtoSaledCarUI);
+    public RootEntity<DtoSaledCar> buyCar(Long galleristCarId);
 
 }

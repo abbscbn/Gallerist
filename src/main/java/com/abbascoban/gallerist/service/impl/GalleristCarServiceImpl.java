@@ -22,6 +22,7 @@ import org.springframework.beans.BeanUtils;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 
@@ -42,27 +43,35 @@ public class GalleristCarServiceImpl implements IGalleristCarService {
 
     private GalleristCar createGalleristCar(DtoGalleristCarUI dtoGalleristCarUI) {
 
+        String username = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        Gallerist gallerist = galleristRepository.findByUser_Username(username).orElseThrow(() -> new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST, "")));
+
+
+
         GalleristCar galleristCar= new GalleristCar();
 
 
-        Optional<Gallerist> optGallerist = galleristRepository.findById(dtoGalleristCarUI.getGalleristId());
         Optional<Car> optCar = carRepository.findById(dtoGalleristCarUI.getCaId());
 
-        if(optGallerist.isEmpty() && optCar.isEmpty()) {
-            throw new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST, dtoGalleristCarUI.getCaId().toString()+" "+dtoGalleristCarUI.getGalleristId()));
+        if(optCar.isEmpty()) {
+            throw new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST, ""));
         }
 
         BeanUtils.copyProperties(dtoGalleristCarUI,galleristCar);
         galleristCar.setCreateTime(new Date());
         galleristCar.setCar(optCar.get());
-        galleristCar.setGallerist(optGallerist.get());
+        galleristCar.setGallerist(gallerist);
 
         return galleristCar;
 
 
     }
 
-    @PreAuthorize("hasRole('ADMIN','GALLERIST')")
+    @PreAuthorize("hasAnyRole('ADMIN','GALLERIST')")
     @Override
     public DtoGalleristCar saveGalleristCar(DtoGalleristCarUI dtoGalleristCarUI) {
         DtoGalleristCar dtoGalleristCar= new DtoGalleristCar();
@@ -97,11 +106,12 @@ public class GalleristCarServiceImpl implements IGalleristCarService {
             throw new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST,""));
         }
 
-        Optional<Gallerist> optGallerist = galleristRepository.findById(dtoGalleristCarUI.getGalleristId());
+        String username = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
 
-        if(optGallerist.isEmpty()){
-            throw new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST,""));
-        }
+        Gallerist gallerist = galleristRepository.findByUser_Username(username).orElseThrow(() -> new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST, "")));
 
         Optional<Car> optCar = carRepository.findById(dtoGalleristCarUI.getCaId());
 
@@ -109,8 +119,16 @@ public class GalleristCarServiceImpl implements IGalleristCarService {
             throw new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST,""));
 
         }
+            // Server-Side kontrol sağlamak için frontend ve backend uyuşuyor mu diye
+        if(!gallerist.getUser().getUsername().equals(optGalleristCar.get().getGallerist().getUser().getUsername())){
+
+            throw new BaseException(new ErrorMessage(MessageType.UNAUTHORIZED_ACCESS_ERROR,""));
+        }
+
+
+
         BeanUtils.copyProperties(dtoGalleristCarUI,optGalleristCar.get());
-        optGalleristCar.get().setGallerist(optGallerist.get());
+        optGalleristCar.get().setGallerist(gallerist);
         optGalleristCar.get().setCar(optCar.get());
 
         GalleristCar updatedGalleristCar = galleristCarRepository.save(optGalleristCar.get());
@@ -174,6 +192,26 @@ public class GalleristCarServiceImpl implements IGalleristCarService {
        }
 
         return "Success";
+    }
+
+    @Override
+    public DtoGalleristCar getGalleristCarById(Long id) {
+
+        GalleristCar galleristCar = galleristCarRepository.findById(id).orElseThrow(() -> new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST, "")));
+
+        DtoGallerist dtoGallerist= new DtoGallerist();
+        DtoCar dtoCar= new DtoCar();
+        DtoGalleristCar dtoGalleristCar= new DtoGalleristCar();
+
+        BeanUtils.copyProperties(galleristCar.getGallerist(),dtoGallerist);
+        BeanUtils.copyProperties(galleristCar.getCar(),dtoCar);
+
+        BeanUtils.copyProperties(galleristCar,dtoGalleristCar);
+
+        dtoGalleristCar.setGallerist(dtoGallerist);
+        dtoGalleristCar.setCar(dtoCar);
+
+        return dtoGalleristCar;
     }
 
 }

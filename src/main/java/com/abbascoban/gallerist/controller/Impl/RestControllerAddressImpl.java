@@ -28,7 +28,7 @@ public class RestControllerAddressImpl extends RestBaseController implements IRe
         return ok(addressService.saveAddress(dtoAddressUI));
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     @Override
     public RootEntity<DtoAddress> updateAddress(@Valid @RequestBody DtoAddress dtoAddress) {
         return ok(addressService.updateAddress(dtoAddress));

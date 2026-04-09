@@ -16,6 +16,8 @@ public interface IRestGalleristCarController {
 
     public RootEntity<String> deleteGalleristCar(DtoGalleristCarDeleteReq dtoGalleristCarDeleteReq);
 
+    public RootEntity<DtoGalleristCar> getGalleristCarById(Long id);
+
 
 
 }

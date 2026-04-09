@@ -17,5 +17,7 @@ public interface ICustomerService {
 
     public String deleteCustomer(DtoCustomerDeleteReq dtoCustomerDeleteReq);
 
+    public DtoCustomer getCustomer();
+
 
 }

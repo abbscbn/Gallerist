@@ -23,7 +23,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 
-@PreAuthorize("hasRole('ADMIN')")
+
 @Service
 @RequiredArgsConstructor
 public class CarServiceImpl  implements ICarService {

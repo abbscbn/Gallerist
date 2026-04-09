@@ -22,12 +22,12 @@ public class CurrencyRatesServiceImpl implements ICurrencyRatesService {
 
 
     @Override
-    public List<CurrencyRatesResponse> getCurrencyRates(String startDate, String endDate) {
+    public CurrencyRatesResponse getCurrencyRates() {
 
         String rootURL="https://api.frankfurter.dev/v2/rates";
 
 
-        String endpoint=rootURL+"?from="+startDate+"&to="+endDate+"&quotes=TRY"; //+"series="+series+"&startDate="+startDate+"&"+"endDate="+endDate+"&type="+type;
+        String endpoint="https://api.frankfurter.dev/v2/rate/EUR/TRY"; //+"series="+series+"&startDate="+startDate+"&"+"endDate="+endDate+"&type="+type;
 
 
         HttpHeaders httpHeaders= new HttpHeaders();
@@ -38,7 +38,7 @@ public class CurrencyRatesServiceImpl implements ICurrencyRatesService {
         try {
 
             RestTemplate restTemplate= new RestTemplate();
-            ResponseEntity<List<CurrencyRatesResponse>> response = restTemplate.exchange(endpoint,HttpMethod.GET, httpEntity, new ParameterizedTypeReference<List<CurrencyRatesResponse>>() {
+            ResponseEntity<CurrencyRatesResponse> response = restTemplate.exchange(endpoint,HttpMethod.GET, httpEntity, new ParameterizedTypeReference<CurrencyRatesResponse>() {
             });
 
             if(response.getStatusCode().is2xxSuccessful()) {

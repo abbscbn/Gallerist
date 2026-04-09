@@ -17,6 +17,8 @@ public interface IGalleristCarService {
 
     public String deleteGalleristCar(DtoGalleristCarDeleteReq dtoGalleristCarDeleteReq);
 
+    public DtoGalleristCar getGalleristCarById(Long id);
+
 
 
 }

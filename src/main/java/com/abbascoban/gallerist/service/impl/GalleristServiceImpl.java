@@ -84,12 +84,15 @@ public class GalleristServiceImpl implements IGalleristService {
     @Override
     public DtoGallerist updateGallerist(DtoGalleristUI dtoGalleristUI) {
 
+        String username = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
 
-        Optional<Gallerist> optGallerist = galleristRepository.findById(dtoGalleristUI.getId());
+        Gallerist gallerist = galleristRepository.findByUser_Username(username)
+                .orElseThrow(() -> new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST, "")));
 
-        if(optGallerist.isEmpty()){
-            throw new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST,""));
-        }
+
 
         Optional<Address> optAddress = addressRepository.findById(dtoGalleristUI.getAddressId());
 
@@ -97,20 +100,21 @@ public class GalleristServiceImpl implements IGalleristService {
             throw new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST,""));
         }
 
-        Optional<User> optUser = userRepository.findById(dtoGalleristUI.getUserId());
 
-        if(optUser.isEmpty()){
-            throw new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST,""));
-        }
+        Long galleristId= gallerist.getId();
 
-        User user = optGallerist.get().getUser();
+        User user =gallerist.getUser();
 
-        BeanUtils.copyProperties(dtoGalleristUI,optGallerist.get());
-        optGallerist.get().setAddress(optAddress.get());
-        optGallerist.get().setUser(user); // user ı sabit kalsın diye
-        optGallerist.get().setCreateTime(new Date());
+        BeanUtils.copyProperties(dtoGalleristUI,gallerist);
+        gallerist.setId(galleristId); // id sini kayboluyor yukarda toplu setlerken
 
-        Gallerist updatedGallerist = galleristRepository.save(optGallerist.get());
+        gallerist.setAddress(optAddress.get());
+        gallerist.setUser(user); // user ı sabit kalsın diye
+        gallerist.setCreateTime(new Date());
+
+        Gallerist updatedGallerist = galleristRepository.save(gallerist);
+        user.setIsProfileCompleted(true);
+        userRepository.save(user);
 
         DtoAddress dtoAddress= new DtoAddress();
         DtoUser dtoUser= new DtoUser();

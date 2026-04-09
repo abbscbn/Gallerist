@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface ICurrencyRatesService {
 
-    public List<CurrencyRatesResponse> getCurrencyRates(String startDate, String endDate);
+    public CurrencyRatesResponse getCurrencyRates();
 
 }

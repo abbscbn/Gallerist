@@ -32,7 +32,7 @@ public class RestCustomerControllerImpl extends RestBaseController implements IR
 
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     @Override
     public RootEntity<DtoCustomer> updateCustomer(@Valid @RequestBody DtoCustomerUI dtoCustomerUI) {
         return ok(customerService.updateCustomer(dtoCustomerUI));
@@ -48,6 +48,12 @@ public class RestCustomerControllerImpl extends RestBaseController implements IR
     @Override
     public RootEntity<String> deleteCustomer(@RequestBody DtoCustomerDeleteReq dtoCustomerDeleteReq) {
         return ok(customerService.deleteCustomer(dtoCustomerDeleteReq));
+    }
+
+    @GetMapping("/me")
+    @Override
+    public RootEntity<DtoCustomer> getCustomer() {
+        return ok(customerService.getCustomer());
     }
 
 }

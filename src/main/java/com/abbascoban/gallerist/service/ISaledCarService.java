@@ -6,6 +6,6 @@ import com.abbascoban.gallerist.dto.DtoSaledCarUI;
 
 public interface ISaledCarService {
 
-    public DtoSaledCar buyCar(DtoSaledCarUI dtoSaledCarUI);
+    public DtoSaledCar buyCar(Long galleristCarId);
 
 }

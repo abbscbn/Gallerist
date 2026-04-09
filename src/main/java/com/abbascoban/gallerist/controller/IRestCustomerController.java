@@ -17,4 +17,6 @@ public interface IRestCustomerController {
 
     public RootEntity<String> deleteCustomer(DtoCustomerDeleteReq dtoCustomerDeleteReq);
 
+    public RootEntity<DtoCustomer> getCustomer();
+
 }

@@ -18,11 +18,11 @@ import com.abbascoban.gallerist.service.ISaledCarService;
 import com.abbascoban.gallerist.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 
-@PreAuthorize("hasAnyRole('ADMIN','CUSTOMER')")
+
 @Service
 @RequiredArgsConstructor
 public class SaledCarServiceImpl implements ISaledCarService {
@@ -44,9 +44,9 @@ public class SaledCarServiceImpl implements ISaledCarService {
 
     public BigDecimal convertCustomerAmountToEUR(Customer customer) {
 
-        List<CurrencyRatesResponse> currencyRates = currencyRatesService.getCurrencyRates(DateUtils.getCurrentDate(new Date()), DateUtils.getCurrentDate(new Date()));
+        CurrencyRatesResponse currencyRates = currencyRatesService.getCurrencyRates();
 
-        BigDecimal eur= BigDecimal.valueOf(currencyRates.get(0).getRate());
+        BigDecimal eur= BigDecimal.valueOf(currencyRates.getRate());
 
         BigDecimal customerUSDAmount = customer.getAccount().getAmount().divide(eur,2,RoundingMode.HALF_UP);
 
@@ -56,17 +56,28 @@ public class SaledCarServiceImpl implements ISaledCarService {
     }
 
 
-    public boolean checkAmount(DtoSaledCarUI dtoSaledCarUI) {
+    public boolean checkAmount(Long galleristCarId) {
 
-        Optional<Customer> optCustomer = customerRepository.findById(dtoSaledCarUI.getCustomerId());
-        Optional<GalleristCar> optGalleristCar = galleristCarRepository.findById(dtoSaledCarUI.getGalleristCarId());
+        String username = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        Customer customer = customerRepository.findByUser_Username(username).orElseThrow(() -> new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST, "")));
+
+
+        Optional<Customer> optCustomer = customerRepository.findById(customer.getId());
+
+
+
+        Optional<GalleristCar> optGalleristCar = galleristCarRepository.findById(galleristCarId);
 
 
         if(optGalleristCar.isEmpty()) {
             throw new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST,""));
         }
         if(optCustomer.isEmpty()) {
-            throw new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST, dtoSaledCarUI.getCustomerId().toString()));
+            throw new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST, ""));
         }
 
         BigDecimal customerEURAmount = convertCustomerAmountToEUR(optCustomer.get());
@@ -81,12 +92,19 @@ public class SaledCarServiceImpl implements ISaledCarService {
 
     }
 
-    private SaledCar createSaledCar(DtoSaledCarUI dtoSaledCarUI) {
+    private SaledCar createSaledCar(Long galleristCarId) {
+
+        String username = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        Customer customer = customerRepository.findByUser_Username(username).orElseThrow(() -> new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST, "")));
 
         SaledCar saledCar= new SaledCar();
         saledCar.setCreateTime(new Date());
-        Optional<Customer> optCustomer = customerRepository.findById(dtoSaledCarUI.getCustomerId());
-        Optional<GalleristCar> optGalleristCar = galleristCarRepository.findById(dtoSaledCarUI.getGalleristCarId());
+        Optional<Customer> optCustomer = customerRepository.findById(customer.getId());
+        Optional<GalleristCar> optGalleristCar = galleristCarRepository.findById(galleristCarId);
 
 
 
@@ -133,9 +151,9 @@ public class SaledCarServiceImpl implements ISaledCarService {
 
         BigDecimal remaningCustomerEURAmount=customerEURAmount.subtract(galleristCar.getPrice());
 
-        List<CurrencyRatesResponse> currencyRates = currencyRatesService.getCurrencyRates(DateUtils.getCurrentDate(new Date()), DateUtils.getCurrentDate(new Date()));
+        CurrencyRatesResponse currencyRates = currencyRatesService.getCurrencyRates();
 
-        BigDecimal eur= BigDecimal.valueOf(currencyRates.get(0).getRate());
+        BigDecimal eur= BigDecimal.valueOf(currencyRates.getRate());
 
         return remaningCustomerEURAmount.multiply(eur);
 
@@ -175,19 +193,17 @@ public class SaledCarServiceImpl implements ISaledCarService {
     }
 
     @Override
-    public DtoSaledCar buyCar(DtoSaledCarUI dtoSaledCarUI) {
+    public DtoSaledCar buyCar(Long galleristCarId) {
 
-
-
-        if(!checkCarStatus(dtoSaledCarUI.getGalleristCarId())) {
-            throw new BaseException(new ErrorMessage(MessageType.CAR_STATUS_IS_ALREADY_SALED, dtoSaledCarUI.getGalleristCarId().toString()));
+        if(!checkCarStatus(galleristCarId)) {
+            throw new BaseException(new ErrorMessage(MessageType.CAR_STATUS_IS_ALREADY_SALED, ""));
         }
 
-        if(!checkAmount(dtoSaledCarUI)) {
-            throw new BaseException(new ErrorMessage(MessageType.CUSTOMER_AMOUNT_IS_NOT_ENOUGH, dtoSaledCarUI.getCustomerId().toString()));
+        if(!checkAmount(galleristCarId)) {
+            throw new BaseException(new ErrorMessage(MessageType.CUSTOMER_AMOUNT_IS_NOT_ENOUGH, ""));
         }
 
-        SaledCar savedSaledCar = saledCarRepository.save(createSaledCar(dtoSaledCarUI));
+        SaledCar savedSaledCar = saledCarRepository.save(createSaledCar(galleristCarId));
 
         GalleristCar galleristCar = savedSaledCar.getGalleristCar();
         galleristCar.setCarStatusType(CarStatusType.SALED);

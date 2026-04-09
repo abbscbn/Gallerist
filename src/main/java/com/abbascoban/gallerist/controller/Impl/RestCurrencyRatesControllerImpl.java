@@ -25,7 +25,7 @@ public class RestCurrencyRatesControllerImpl extends RestBaseController implemen
     @GetMapping("/currency-rates")
     @Override
     public RootEntity<List<CurrencyRatesResponse>> getCurrencyRates(@RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate) {
-        return ok(currencyRatesService.getCurrencyRates(startDate, endDate));
+        return null;
     }
 
 }

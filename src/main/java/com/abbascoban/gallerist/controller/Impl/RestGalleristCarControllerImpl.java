@@ -8,7 +8,6 @@ import com.abbascoban.gallerist.dto.DtoGalleristCarDeleteReq;
 import com.abbascoban.gallerist.dto.DtoGalleristCarUI;
 import com.abbascoban.gallerist.service.IGalleristCarService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -47,6 +46,12 @@ public class RestGalleristCarControllerImpl extends RestBaseController implement
     @Override
     public RootEntity<String> deleteGalleristCar(@RequestBody DtoGalleristCarDeleteReq dtoGalleristCarDeleteReq) {
         return ok(galleristCarService.deleteGalleristCar(dtoGalleristCarDeleteReq));
+    }
+
+    @GetMapping("/get/{id}")
+    @Override
+    public RootEntity<DtoGalleristCar> getGalleristCarById(@PathVariable(name = "id") Long id) {
+        return ok(galleristCarService.getGalleristCarById(id));
     }
 
 }

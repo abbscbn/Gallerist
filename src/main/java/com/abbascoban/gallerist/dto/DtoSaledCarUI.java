@@ -10,8 +10,6 @@ import lombok.Setter;
 public class DtoSaledCarUI {
 
     @NotNull
-    private Long customerId;
-    @NotNull
     private Long galleristCarId;
 
 }

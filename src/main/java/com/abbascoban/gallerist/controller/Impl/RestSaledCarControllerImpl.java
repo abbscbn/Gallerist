@@ -8,11 +8,7 @@ import com.abbascoban.gallerist.dto.DtoSaledCarUI;
 import com.abbascoban.gallerist.service.ISaledCarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 
 
 import jakarta.validation.Valid;
@@ -25,11 +21,11 @@ public class RestSaledCarControllerImpl extends RestBaseController implements IR
 
     private final ISaledCarService saledCarService;
 
-    @PostMapping("/save")
+    @PostMapping("/save/{id}")
     @Override
-    public RootEntity<DtoSaledCar> buyCar(@Valid @RequestBody DtoSaledCarUI dtoSaledCarUI) {
+    public RootEntity<DtoSaledCar> buyCar(@PathVariable(name = "id") Long galleristCarId) {
 
-        return ok(saledCarService.buyCar(dtoSaledCarUI));
+        return ok(saledCarService.buyCar(galleristCarId));
     }
 
 
