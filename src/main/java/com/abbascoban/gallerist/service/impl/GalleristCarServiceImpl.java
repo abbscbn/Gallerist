@@ -96,7 +96,7 @@ public class GalleristCarServiceImpl implements IGalleristCarService {
         return dtoGalleristCar;
     }
 
-    @PreAuthorize("hasRole('ADMIN','GALLERIST')")
+    @PreAuthorize("hasAnyRole('ADMIN','GALLERIST')")
     @Override
     public DtoGalleristCar updateGalleristCar(DtoGalleristCarUI dtoGalleristCarUI) {
 
@@ -175,18 +175,18 @@ public class GalleristCarServiceImpl implements IGalleristCarService {
         return dtoGalleristCarList;
     }
 
-    @PreAuthorize("hasRole('ADMIN','GALLERIST')")
+    @PreAuthorize("hasAnyRole('ADMIN','GALLERIST')")
     @Override
-    public String deleteGalleristCar(DtoGalleristCarDeleteReq dtoGalleristCarDeleteReq) {
+    public String deleteGalleristCar(Long galleristCarId) {
 
-        Optional<GalleristCar> optGalleristCar = galleristCarRepository.findById(dtoGalleristCarDeleteReq.getGalleristCarId());
+        Optional<GalleristCar> optGalleristCar = galleristCarRepository.findById(galleristCarId);
 
         if(optGalleristCar.isEmpty()){
             throw new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST,""));
         }
 
        try {
-           galleristCarRepository.deleteById(dtoGalleristCarDeleteReq.getGalleristCarId());
+           galleristCarRepository.deleteById(galleristCarId);
        } catch (Exception e) {
            throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION,e.getMessage()));
        }
@@ -212,6 +212,45 @@ public class GalleristCarServiceImpl implements IGalleristCarService {
         dtoGalleristCar.setCar(dtoCar);
 
         return dtoGalleristCar;
+    }
+
+    @Override
+    public List<DtoGalleristCar> getGalleristCarsByGalleristId() {
+
+        String username = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        Gallerist gallerist = galleristRepository.findByUser_Username(username).orElseThrow(() -> new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST, "")));
+
+        List<GalleristCar> galleristCars = galleristCarRepository.findByGallerist_Id(gallerist.getId());
+
+        List<DtoGalleristCar> dtoGalleristCarList= new ArrayList<>();
+
+
+        galleristCars.forEach(galleristCar -> {
+
+            DtoGallerist dtoGallerist= new DtoGallerist();
+            DtoCar dtoCar= new DtoCar();
+            DtoGalleristCar dtoGalleristCar= new DtoGalleristCar();
+
+            BeanUtils.copyProperties(galleristCar.getGallerist(),dtoGallerist);
+            BeanUtils.copyProperties(galleristCar.getCar(),dtoCar);
+
+            BeanUtils.copyProperties(galleristCar,dtoGalleristCar);
+
+            dtoGalleristCar.setGallerist(dtoGallerist);
+            dtoGalleristCar.setCar(dtoCar);
+
+            dtoGalleristCarList.add(dtoGalleristCar);
+
+        });
+
+        return dtoGalleristCarList;
+
+
+
     }
 
 }

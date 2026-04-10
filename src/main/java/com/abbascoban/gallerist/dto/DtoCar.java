@@ -24,6 +24,8 @@ public class DtoCar extends DtoBase{
     @NotNull
     private Integer productionYear;
 
+    private String imageUrl;
+
 
 
 }

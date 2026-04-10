@@ -1,5 +1,6 @@
 package com.abbascoban.gallerist.service.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,6 +17,7 @@ import com.abbascoban.gallerist.model.BaseEntity;
 import com.abbascoban.gallerist.model.Car;
 import com.abbascoban.gallerist.repository.CarRepository;
 import com.abbascoban.gallerist.service.ICarService;
+import com.abbascoban.gallerist.service.IFileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Sort;
@@ -31,17 +33,21 @@ public class CarServiceImpl  implements ICarService {
 
     private final CarRepository carRepository;
 
-    private Car createCar(DtoCarUI dtoCarUI) {
+    private final IFileStorageService fileStorageService;
+
+    private Car createCar(DtoCarUI dtoCarUI) throws IOException {
 
         Car car= new Car();
         BeanUtils.copyProperties(dtoCarUI, car);
         car.setCreateTime(new Date());
+        String imageUrl = fileStorageService.uploadFile(dtoCarUI.getFile());
+        car.setImageUrl(imageUrl);
         return car;
 
     }
 
     @Override
-    public DtoCar saveCar(DtoCarUI dtoCarUI) {
+    public DtoCar saveCar(DtoCarUI dtoCarUI) throws IOException {
         DtoCar dtoCar= new DtoCar();
         Car car = createCar(dtoCarUI);
         Car savedCar = carRepository.save(car);
@@ -51,22 +57,34 @@ public class CarServiceImpl  implements ICarService {
 
     @Override
     public DtoCar updateCar(DtoCarUI dtoCarUI) {
-
-        DtoCar dtoCar= new DtoCar();
-
         Optional<Car> optCar = carRepository.findById(dtoCarUI.getId());
 
-        if(optCar.isEmpty()){
-            throw new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST,""));
+        if (optCar.isEmpty()) {
+            throw new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST, ""));
         }
 
-        BeanUtils.copyProperties(dtoCarUI,optCar.get());
-        optCar.get().setCreateTime(new Date());
+        Car car = optCar.get();
 
-        Car updatedCar = carRepository.save(optCar.get());
+        // 🔹 sadece değiştirilebilir alanlar
+        car.setBrand(dtoCarUI.getBrand());
+        car.setModel(dtoCarUI.getModel());
+        car.setProductionYear(dtoCarUI.getProductionYear());
 
-        BeanUtils.copyProperties(updatedCar,dtoCar);
+        // 🔥 IMAGE UPDATE (kritik fix)
+        if (dtoCarUI.getFile() != null && !dtoCarUI.getFile().isEmpty()) {
+            try {
+                String imageUrl = fileStorageService.uploadFile(dtoCarUI.getFile());
+                car.setImageUrl(imageUrl);
+            } catch (IOException e) {
+                throw new RuntimeException("Image upload failed");
+            }
+        }
 
+
+        Car updatedCar = carRepository.save(car);
+
+        DtoCar dtoCar = new DtoCar();
+        BeanUtils.copyProperties(updatedCar, dtoCar);
 
         return dtoCar;
     }

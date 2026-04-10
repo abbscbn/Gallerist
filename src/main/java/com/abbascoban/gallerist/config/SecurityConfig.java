@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .and()
                 .csrf().disable()
                 .authorizeHttpRequests(request->
-                        request.requestMatchers(REGISTER , AUTHENTICATE , REFRESH_TOKEN,GET_ALL_GALLERISTCAR).permitAll()
+                        request.requestMatchers(REGISTER , AUTHENTICATE , REFRESH_TOKEN,GET_ALL_GALLERISTCAR,"/uploads/**").permitAll()
                                 .anyRequest()
                                 .authenticated())
                 .exceptionHandling().authenticationEntryPoint(authEntryPoint).accessDeniedHandler(customAccessDeniedHandler).and()

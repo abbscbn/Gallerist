@@ -33,7 +33,7 @@ public class RestGalleristControllerImpl extends RestBaseController implements I
 
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     @Override
     public RootEntity<DtoGallerist> updateGallerist(@Valid @RequestBody DtoGalleristUI dtoGalleristUI) {
 

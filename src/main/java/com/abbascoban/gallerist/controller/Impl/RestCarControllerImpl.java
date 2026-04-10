@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -24,15 +25,15 @@ public class RestCarControllerImpl extends RestBaseController implements IRestCa
 
     private final ICarService carService;
 
-    @PostMapping("/save")
+    @PostMapping(value = "/save", consumes = "multipart/form-data")
     @Override
-    public RootEntity<DtoCar> saveCar(@Valid @RequestBody DtoCarUI dtoCarUI) {
+    public RootEntity<DtoCar> saveCar(@Valid @ModelAttribute DtoCarUI dtoCarUI) throws IOException {
         return ok(carService.saveCar(dtoCarUI));
     }
 
-    @PostMapping("/update")
+    @PutMapping(value = "/update", consumes = "multipart/form-data")
     @Override
-    public RootEntity<DtoCar> updateCar(@Valid @RequestBody DtoCarUI dtoCarUI) {
+    public RootEntity<DtoCar> updateCar(@Valid @ModelAttribute DtoCarUI dtoCarUI) {
         return ok(carService.updateCar(dtoCarUI));
     }
 

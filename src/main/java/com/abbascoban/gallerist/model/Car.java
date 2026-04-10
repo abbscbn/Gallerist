@@ -29,6 +29,9 @@ public class Car extends BaseEntity{
     @Column(name = "production_year")
     private Integer productionYear;
 
+    @Column(name = "image_url", nullable = true)
+    private String imageUrl;
+
 
 
 

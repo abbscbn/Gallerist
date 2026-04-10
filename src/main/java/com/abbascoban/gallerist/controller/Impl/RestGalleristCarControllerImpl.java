@@ -30,7 +30,7 @@ public class RestGalleristCarControllerImpl extends RestBaseController implement
         return ok(galleristCarService.saveGalleristCar(dtoGalleristCarUI));
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     @Override
     public RootEntity<DtoGalleristCar> updateGalleristCar(@Valid @RequestBody DtoGalleristCarUI dtoGalleristCarUI) {
         return ok(galleristCarService.updateGalleristCar(dtoGalleristCarUI));
@@ -42,16 +42,22 @@ public class RestGalleristCarControllerImpl extends RestBaseController implement
         return ok(galleristCarService.gelAllGalleristCar());
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/{id}")
     @Override
-    public RootEntity<String> deleteGalleristCar(@RequestBody DtoGalleristCarDeleteReq dtoGalleristCarDeleteReq) {
-        return ok(galleristCarService.deleteGalleristCar(dtoGalleristCarDeleteReq));
+    public RootEntity<String> deleteGalleristCar(@PathVariable(name = "id") Long galleristCarId) {
+        return ok(galleristCarService.deleteGalleristCar(galleristCarId));
     }
 
     @GetMapping("/get/{id}")
     @Override
     public RootEntity<DtoGalleristCar> getGalleristCarById(@PathVariable(name = "id") Long id) {
         return ok(galleristCarService.getGalleristCarById(id));
+    }
+
+    @GetMapping("/me")
+    @Override
+    public RootEntity<List<DtoGalleristCar>> getGalleristCarsByGalleristId() {
+        return ok(galleristCarService.getGalleristCarsByGalleristId());
     }
 
 }

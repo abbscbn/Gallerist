@@ -14,9 +14,11 @@ public interface IRestGalleristCarController {
 
     public RootEntity<List<DtoGalleristCar>> gelAllGalleristCar();
 
-    public RootEntity<String> deleteGalleristCar(DtoGalleristCarDeleteReq dtoGalleristCarDeleteReq);
+    public RootEntity<String> deleteGalleristCar(Long galleristCarId);
 
     public RootEntity<DtoGalleristCar> getGalleristCarById(Long id);
+
+    public RootEntity<List<DtoGalleristCar>> getGalleristCarsByGalleristId();
 
 
 
