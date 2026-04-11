@@ -24,8 +24,9 @@ public class SecurityConfig {
     public static final String REGISTER = "/register";
     public static final String AUTHENTICATE = "/authenticate";
     public static final String REFRESH_TOKEN = "/refreshToken";
-    public static final String GET_ALL_GALLERISTCAR="/rest/api/gallerist-car/getallgalleristcar";
-
+    public static final String GET_ALL_GALLERISTCAR="/rest/api/gallerist-car/getallgalleristcar/**";
+    public static final String GET_GALLERISTCAR_DETAIL="/rest/api/gallerist-car/get/**";
+    public static final String GET_GALLERISTCAR_FILTER="/rest/api/gallerist-car/filter/**";
 
     private final AuthenticationProvider authenticationProvider;
 
@@ -43,7 +44,7 @@ public class SecurityConfig {
                 .and()
                 .csrf().disable()
                 .authorizeHttpRequests(request->
-                        request.requestMatchers(REGISTER , AUTHENTICATE , REFRESH_TOKEN,GET_ALL_GALLERISTCAR,"/uploads/**").permitAll()
+                        request.requestMatchers(REGISTER , AUTHENTICATE , REFRESH_TOKEN,GET_ALL_GALLERISTCAR,GET_GALLERISTCAR_DETAIL,GET_GALLERISTCAR_FILTER,"/uploads/**").permitAll()
                                 .anyRequest()
                                 .authenticated())
                 .exceptionHandling().authenticationEntryPoint(authEntryPoint).accessDeniedHandler(customAccessDeniedHandler).and()

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.abbascoban.gallerist.dto.*;
+import com.abbascoban.gallerist.enums.CarStatusType;
 import com.abbascoban.gallerist.exception.BaseException;
 import com.abbascoban.gallerist.exception.ErrorMessage;
 import com.abbascoban.gallerist.exception.MessageType;
@@ -20,6 +21,8 @@ import com.abbascoban.gallerist.service.IGalleristCarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -149,30 +152,26 @@ public class GalleristCarServiceImpl implements IGalleristCarService {
     }
 
     @Override
-    public List<DtoGalleristCar> gelAllGalleristCar() {
-        List<DtoGalleristCar> dtoGalleristCarList= new ArrayList<>();
-        Sort sort= Sort.by(Sort.Direction.ASC,"id");
-        List<GalleristCar> allGalleristCar = galleristCarRepository.findAll(sort);
+    public Page<DtoGalleristCar> getAllGalleristCar(Pageable pageable) {
 
-        allGalleristCar.forEach(galleristCar -> {
+        Page<GalleristCar> page =
+                galleristCarRepository.findByCarStatusType(CarStatusType.SALABLE, pageable);
 
-            DtoGallerist dtoGallerist= new DtoGallerist();
-            DtoCar dtoCar= new DtoCar();
-            DtoGalleristCar dtoGalleristCar= new DtoGalleristCar();
+        return page.map(galleristCar -> {
 
-            BeanUtils.copyProperties(galleristCar.getGallerist(),dtoGallerist);
-            BeanUtils.copyProperties(galleristCar.getCar(),dtoCar);
+            DtoGallerist dtoGallerist = new DtoGallerist();
+            DtoCar dtoCar = new DtoCar();
+            DtoGalleristCar dtoGalleristCar = new DtoGalleristCar();
 
-            BeanUtils.copyProperties(galleristCar,dtoGalleristCar);
+            BeanUtils.copyProperties(galleristCar.getGallerist(), dtoGallerist);
+            BeanUtils.copyProperties(galleristCar.getCar(), dtoCar);
+            BeanUtils.copyProperties(galleristCar, dtoGalleristCar);
 
             dtoGalleristCar.setGallerist(dtoGallerist);
             dtoGalleristCar.setCar(dtoCar);
 
-            dtoGalleristCarList.add(dtoGalleristCar);
-
+            return dtoGalleristCar;
         });
-
-        return dtoGalleristCarList;
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','GALLERIST')")
@@ -251,6 +250,42 @@ public class GalleristCarServiceImpl implements IGalleristCarService {
 
 
 
+    }
+
+    @Override
+    public Page<DtoGalleristCar> filter(String brand, String model, Pageable pageable) {
+
+        if (model != null && model.isEmpty()) {
+            model = null;
+        }
+
+        if (brand != null && brand.isEmpty()) {
+            brand = null;
+        }
+
+        Page<GalleristCar> page =
+                galleristCarRepository.filterCars(
+                        brand,
+                        model,
+                        CarStatusType.SALABLE,
+                        pageable
+                );
+
+        return page.map(galleristCar -> {
+
+            DtoGallerist dtoGallerist = new DtoGallerist();
+            DtoCar dtoCar = new DtoCar();
+            DtoGalleristCar dtoGalleristCar = new DtoGalleristCar();
+
+            BeanUtils.copyProperties(galleristCar.getGallerist(), dtoGallerist);
+            BeanUtils.copyProperties(galleristCar.getCar(), dtoCar);
+            BeanUtils.copyProperties(galleristCar, dtoGalleristCar);
+
+            dtoGalleristCar.setGallerist(dtoGallerist);
+            dtoGalleristCar.setCar(dtoCar);
+
+            return dtoGalleristCar;
+        });
     }
 
 }

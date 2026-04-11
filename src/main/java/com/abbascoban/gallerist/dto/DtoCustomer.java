@@ -21,6 +21,9 @@ public class DtoCustomer extends DtoBase {
     private Date birthOfDate;
 
 
+    private String imageUrl;
+
+
     private DtoAddress address;
 
     private DtoAccount account;

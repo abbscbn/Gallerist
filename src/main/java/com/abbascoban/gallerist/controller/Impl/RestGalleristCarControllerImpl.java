@@ -8,6 +8,10 @@ import com.abbascoban.gallerist.dto.DtoGalleristCarDeleteReq;
 import com.abbascoban.gallerist.dto.DtoGalleristCarUI;
 import com.abbascoban.gallerist.service.IGalleristCarService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -37,9 +41,11 @@ public class RestGalleristCarControllerImpl extends RestBaseController implement
     }
 
     @GetMapping("/getallgalleristcar")
-    @Override
-    public RootEntity<List<DtoGalleristCar>> gelAllGalleristCar() {
-        return ok(galleristCarService.gelAllGalleristCar());
+    public RootEntity<Page<DtoGalleristCar>> getAllGalleristCar(
+            @PageableDefault(size = 6,page = 0,sort = "id", direction = Sort.Direction.DESC)
+            Pageable pageable) {
+
+        return ok(galleristCarService.getAllGalleristCar(pageable));
     }
 
     @DeleteMapping("/delete/{id}")
@@ -58,6 +64,14 @@ public class RestGalleristCarControllerImpl extends RestBaseController implement
     @Override
     public RootEntity<List<DtoGalleristCar>> getGalleristCarsByGalleristId() {
         return ok(galleristCarService.getGalleristCarsByGalleristId());
+    }
+    @GetMapping("/filter")
+    @Override
+    public RootEntity<Page<DtoGalleristCar>> filter(@RequestParam(required = false) String brand,
+                                                    @RequestParam(required = false) String model,
+                                                    Pageable pageable) {
+
+        return ok(galleristCarService.filter(brand,model,pageable));
     }
 
 }

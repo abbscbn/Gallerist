@@ -1,5 +1,6 @@
 package com.abbascoban.gallerist.service.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -15,6 +16,7 @@ import com.abbascoban.gallerist.model.User;
 import com.abbascoban.gallerist.repository.AddressRepository;
 import com.abbascoban.gallerist.repository.GalleristRepository;
 import com.abbascoban.gallerist.repository.UserRepository;
+import com.abbascoban.gallerist.service.IFileStorageService;
 import com.abbascoban.gallerist.service.IGalleristService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -35,6 +37,8 @@ public class GalleristServiceImpl implements IGalleristService {
     private final GalleristRepository galleristRepository;
 
     private final UserRepository userRepository;
+
+    private final IFileStorageService fileStorageService;
 
 
     private Gallerist createGallerist(DtoGalleristUI dtoGalleristUI) {
@@ -82,7 +86,7 @@ public class GalleristServiceImpl implements IGalleristService {
     }
 
     @Override
-    public DtoGallerist updateGallerist(DtoGalleristUI dtoGalleristUI) {
+    public DtoGallerist updateGallerist(DtoGalleristUI dtoGalleristUI) throws IOException {
 
         String username = SecurityContextHolder
                 .getContext()
@@ -98,6 +102,12 @@ public class GalleristServiceImpl implements IGalleristService {
 
         if(optAddress.isEmpty()){
             throw new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST,""));
+        }
+
+        if(dtoGalleristUI.getFile()!=null && !dtoGalleristUI.getFile().isEmpty()){
+
+            String imageUrl = fileStorageService.uploadFile(dtoGalleristUI.getFile());
+            gallerist.setImageUrl(imageUrl);
         }
 
 

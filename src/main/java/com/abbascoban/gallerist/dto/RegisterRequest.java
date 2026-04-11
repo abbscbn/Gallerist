@@ -17,5 +17,8 @@ public class RegisterRequest {
     @NotEmpty
     private String role;
 
+    @NotEmpty
+    private String email;
+
 
 }

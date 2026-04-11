@@ -1,5 +1,6 @@
 package com.abbascoban.gallerist.service.impl;
 
+import java.io.IOException;
 import java.util.*;
 
 import com.abbascoban.gallerist.dto.*;
@@ -15,6 +16,7 @@ import com.abbascoban.gallerist.repository.AddressRepository;
 import com.abbascoban.gallerist.repository.CustomerRepository;
 import com.abbascoban.gallerist.repository.UserRepository;
 import com.abbascoban.gallerist.service.ICustomerService;
+import com.abbascoban.gallerist.service.IFileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Sort;
@@ -38,6 +40,8 @@ public class CustomerServiceImpl implements ICustomerService {
     private final UserRepository userRepository;
 
     private final AccountRepository accountRepository;
+
+    private final IFileStorageService fileStorageService;
 
 
 
@@ -91,7 +95,7 @@ public class CustomerServiceImpl implements ICustomerService {
     }
 
     @Override
-    public DtoCustomer updateCustomer(DtoCustomerUI dtoCustomerUI) {
+    public DtoCustomer updateCustomer(DtoCustomerUI dtoCustomerUI) throws IOException {
 
         String username = SecurityContextHolder
                 .getContext()
@@ -112,11 +116,21 @@ public class CustomerServiceImpl implements ICustomerService {
         if(optAccount.isEmpty()){
             throw new BaseException(new ErrorMessage(MessageType.NO_RECORDS_EXIST,""));
         }
+
+        if(dtoCustomerUI.getFile()!=null && !dtoCustomerUI.getFile().isEmpty()){
+
+            String imageUrl = fileStorageService.uploadFile(dtoCustomerUI.getFile());
+            customer.setImageUrl(imageUrl);
+        }
+
+
+
+
         User user= customer.getUser(); // bağlı user değişmesin diye direk mevcutu atıyorum tekrardan
         Long customerId = customer.getId();
         BeanUtils.copyProperties(dtoCustomerUI,customer);
         customer.setId(customerId);
-        customer.setCreateTime(new Date());
+
         customer.setAddress(optAddress.get());
         customer.setAccount(optAccount.get());
         customer.setUser(user);
@@ -141,8 +155,6 @@ public class CustomerServiceImpl implements ICustomerService {
         dtoCustomer.setAddress(dtoAddress);
         dtoCustomer.setAccount(dtoAccount);
         dtoCustomer.setUser(dtoUser);
-
-
 
 
 

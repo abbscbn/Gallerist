@@ -5,13 +5,14 @@ import com.abbascoban.gallerist.dto.DtoCustomer;
 import com.abbascoban.gallerist.dto.DtoCustomerDeleteReq;
 import com.abbascoban.gallerist.dto.DtoCustomerUI;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface ICustomerService {
 
     public DtoCustomer saveCustomer(DtoCustomerUI dtoCustomerUI);
 
-    public DtoCustomer updateCustomer(DtoCustomerUI dtoCustomerUI);
+    public DtoCustomer updateCustomer(DtoCustomerUI dtoCustomerUI) throws IOException;
 
     public List<DtoCustomer> getAllCustomer();
 

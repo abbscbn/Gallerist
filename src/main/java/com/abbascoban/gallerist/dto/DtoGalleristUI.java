@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 
@@ -28,7 +30,10 @@ public class DtoGalleristUI extends DtoBase {
     private String tckn;
 
     @NotNull
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date birthOfDate;
+
+    private MultipartFile file;
 
     @NotNull
     private Long addressId;

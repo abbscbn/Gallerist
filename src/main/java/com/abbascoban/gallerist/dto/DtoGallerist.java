@@ -28,6 +28,9 @@ public class DtoGallerist extends BaseEntity {
     private Date birthOfDate;
 
 
+    private String imageUrl;
+
+
     private DtoAddress address;
 
     private DtoUser user;

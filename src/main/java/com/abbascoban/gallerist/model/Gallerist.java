@@ -35,6 +35,9 @@ public class Gallerist extends BaseEntity {
     @Column(name = "birth_of_date")
     private Date birthOfDate;
 
+    @Column(name = "image_url", nullable = true)
+    private String imageUrl;
+
     @OneToOne
     private Address address;
 
